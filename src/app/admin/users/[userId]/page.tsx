@@ -5,18 +5,32 @@ import Link from "next/link";
 import { UserCredentialsManager } from "@/components/admin/user-credentials-manager";
 import clientPromise from "@/lib/mongodb";
 import type { User, Credential, ActivityLog } from "@/lib/types";
+import { ObjectId } from "mongodb";
 
 const getUserData = async (userId: string) => {
   const client = await clientPromise;
   const db = client.db();
 
-  const userRaw = await db.collection("users").findOne({ id: userId });
-  const userCredentialsRaw = await db.collection("credentials").find({ userId: userId }).toArray();
-  const userActivityRaw = await db.collection("activityLogs").find({ userId: userId }).toArray();
+  // Validate that userId is a valid ObjectId
+  if (!ObjectId.isValid(userId)) {
+      return { user: null, userCredentials: [], userActivity: [] };
+  }
 
-  const user: User | null = userRaw ? { ...userRaw, id: userRaw._id.toString() } as User : null;
-  const userCredentials: Credential[] = userCredentialsRaw.map(c => ({ ...c, id: c._id.toString() })) as Credential[];
-  const userActivity: ActivityLog[] = userActivityRaw.map(a => ({ ...a, id: a._id.toString() })) as ActivityLog[];
+  const userRaw = await db.collection("users").findOne({ _id: new ObjectId(userId) });
+  
+  if (!userRaw) {
+    return { user: null, userCredentials: [], userActivity: [] };
+  }
+
+  // Use the string version of the user's ID to query other collections
+  const userStringId = userRaw._id.toString();
+
+  const userCredentialsRaw = await db.collection("credentials").find({ userId: userStringId }).toArray();
+  const userActivityRaw = await db.collection("activityLogs").find({ userId: userStringId }).toArray();
+
+  const user: User | null = userRaw ? { ...userRaw, id: userRaw._id.toString() } as unknown as User : null;
+  const userCredentials: Credential[] = userCredentialsRaw.map(c => ({ ...c, id: c._id.toString() })) as unknown as Credential[];
+  const userActivity: ActivityLog[] = userActivityRaw.map(a => ({ ...a, id: a._id.toString() })) as unknown as ActivityLog[];
   
   return { user, userCredentials, userActivity };
 };
@@ -43,7 +57,7 @@ export default async function AdminUserDetailPage({ params }: { params: { userId
     <div className="space-y-6">
       <div className="flex items-center gap-4">
         <Button asChild variant="outline" size="icon" className="h-7 w-7">
-          <Link href="/admin/dashboard">
+          <Link href="/admin/dashboard#users">
             <ArrowLeft className="h-4 w-4" />
             <span className="sr-only">Back</span>
           </Link>

@@ -23,7 +23,11 @@ const useMockAuth = () => {
 
 
   useEffect(() => {
-    if (allUsers.length === 0) return; // Wait until users are fetched
+    if (allUsers.length === 0) {
+       // if we have no users, we're not done loading
+       setLoading(true);
+       return; 
+    }
     try {
       const storedEmail = localStorage.getItem("loggedInUser");
       if (storedEmail) {
@@ -71,8 +75,10 @@ const useMockAuth = () => {
 
   const checkAuth = useCallback(
     (role?: UserRole) => {
-      if (loading || allUsers.length === 0) return; // Don't redirect while loading
+      if (loading) return; 
+      
       const storedEmail = typeof window !== 'undefined' ? localStorage.getItem("loggedInUser") : null;
+      
       if (!storedEmail) {
         router.replace("/");
         return;
