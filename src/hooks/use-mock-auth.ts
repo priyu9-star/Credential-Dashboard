@@ -11,15 +11,18 @@ const useMockAuth = () => {
 
   // Fetch all users once to simulate auth checking
   const [allUsers, setAllUsers] = useState<User[]>([]);
-  useEffect(() => {
-    async function fetchUsers() {
-      // In a real app, you'd have an API endpoint for this.
-      const res = await fetch('/api/users?all=true');
-      const data = await res.json();
-      setAllUsers(data.users);
-    }
-    fetchUsers();
+
+  const fetchUsers = useCallback(async () => {
+    // In a real app, you'd have an API endpoint for this.
+    const res = await fetch('/api/users?all=true');
+    const data = await res.json();
+    setAllUsers(data.users);
+    return data.users;
   }, []);
+
+  useEffect(() => {
+    fetchUsers();
+  }, [fetchUsers]);
 
 
   useEffect(() => {
@@ -42,16 +45,15 @@ const useMockAuth = () => {
   }, [allUsers, loading]);
 
   const login = useCallback(
-    (email: string, password?: string) => {
-      // Prevent login attempts until users are loaded
-      if (allUsers.length === 0) {
-        console.log("Login deferred: User list not loaded yet.");
-        // We could also add a retry mechanism here
-        setTimeout(() => login(email, password), 500);
-        return;
-      };
-      
-      const userToLogin = allUsers.find((u) => u.email === email && u.password === password);
+    async (email: string, password?: string) => {
+      let userToLogin = allUsers.find((u) => u.email === email && u.password === password);
+
+      // If user is not found, refresh the list and try again.
+      // This handles the case where a user signs up and immediately tries to log in.
+      if (!userToLogin) {
+        const freshUsers = await fetchUsers();
+        userToLogin = freshUsers.find((u: User) => u.email === email && u.password === password);
+      }
 
       if (userToLogin) {
         try {
@@ -68,7 +70,7 @@ const useMockAuth = () => {
       }
       return userToLogin;
     },
-    [router, allUsers]
+    [router, allUsers, fetchUsers]
   );
 
   const logout = useCallback(() => {

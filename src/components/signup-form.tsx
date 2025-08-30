@@ -6,13 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import useMockAuth from "@/hooks/use-mock-auth";
 
 export function SignupForm() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { login } = useMockAuth();
   const { toast } = useToast();
   const router = useRouter();
 
@@ -47,8 +45,8 @@ export function SignupForm() {
         description: "You can now sign in with your new account.",
       });
 
-      // Automatically log the user in after successful signup
-      login(email, password);
+      // Redirect to login page after successful signup
+      router.push("/");
 
     } catch (error: any) {
        toast({

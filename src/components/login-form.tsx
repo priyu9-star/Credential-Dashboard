@@ -13,7 +13,7 @@ export function LoginForm() {
   const { login } = useMockAuth();
   const { toast } = useToast();
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!email || !password) {
        toast({
@@ -23,7 +23,7 @@ export function LoginForm() {
       });
       return;
     }
-    const user = login(email, password);
+    const user = await login(email, password);
     if (!user) {
       toast({
         variant: "destructive",
