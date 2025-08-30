@@ -3,40 +3,40 @@ import type { User, Credential, ActivityLog } from './types';
 export const users: User[] = [
   {
     id: '1',
-    name: 'Admin User',
+    name: 'Admin Priya',
     email: 'admin@example.com',
     role: 'admin',
     status: 'Onboarded',
-    avatarUrl: 'https://picsum.photos/seed/admin/100/100',
+    avatarUrl: 'https://picsum.photos/seed/priya/100/100',
   },
   {
     id: '2',
-    name: 'Alice Johnson',
-    email: 'alice@example.com',
+    name: 'Aarav Sharma',
+    email: 'aarav@example.com',
     role: 'user',
     status: 'Pending',
-    avatarUrl: 'https://picsum.photos/seed/alice/100/100',
+    avatarUrl: 'https://picsum.photos/seed/aarav/100/100',
   },
   {
     id: '3',
-    name: 'Bob Williams',
-    email: 'bob@example.com',
+    name: 'Diya Patel',
+    email: 'diya@example.com',
     role: 'user',
     status: 'Onboarded',
-    avatarUrl: 'https://picsum.photos/seed/bob/100/100',
+    avatarUrl: 'https://picsum.photos/seed/diya/100/100',
   },
   {
     id: '4',
-    name: 'Charlie Brown',
-    email: 'charlie@example.com',
+    name: 'Rohan Gupta',
+    email: 'rohan@example.com',
     role: 'user',
     status: 'Offboarding-In-Progress',
-    avatarUrl: 'https://picsum.photos/seed/charlie/100/100',
+    avatarUrl: 'https://picsum.photos/seed/rohan/100/100',
   },
 ];
 
 export const credentials: Credential[] = [
-  // Alice's credentials (Pending)
+  // Aarav's credentials (Pending)
   {
     id: 'c1',
     userId: '2',
@@ -62,7 +62,7 @@ export const credentials: Credential[] = [
     assignedAt: '2023-10-01T10:00:00Z',
     updatedAt: '2023-10-02T14:00:00Z',
   },
-  // Bob's credentials (Onboarded)
+  // Diya's credentials (Onboarded)
   {
     id: 'c4',
     userId: '3',
@@ -79,7 +79,7 @@ export const credentials: Credential[] = [
     assignedAt: '2023-09-15T09:00:00Z',
     updatedAt: '2023-09-16T11:30:00Z',
   },
-  // Charlie's credentials (Offboarding)
+  // Rohan's credentials (Offboarding)
   {
     id: 'c6',
     userId: '4',
@@ -102,7 +102,7 @@ export const activityLogs: ActivityLog[] = [
   {
     id: 'l1',
     userId: '2',
-    userName: 'Alice Johnson',
+    userName: 'Aarav Sharma',
     action: 'Problem Reported',
     details: 'Problem with GitHub Access (Read): I can\'t see the private repositories.',
     timestamp: '2023-10-02T14:00:00Z',
@@ -110,7 +110,7 @@ export const activityLogs: ActivityLog[] = [
   {
     id: 'l2',
     userId: '3',
-    userName: 'Bob Williams',
+    userName: 'Diya Patel',
     action: 'Credential Confirmed',
     details: 'Jira Account confirmed.',
     timestamp: '2023-09-16T11:30:00Z',
@@ -118,7 +118,7 @@ export const activityLogs: ActivityLog[] = [
   {
     id: 'l3',
     userId: '3',
-    userName: 'Bob Williams',
+    userName: 'Diya Patel',
     action: 'Status Change',
     details: 'User status changed to Onboarded.',
     timestamp: '2023-09-16T11:30:00Z',
@@ -126,7 +126,7 @@ export const activityLogs: ActivityLog[] = [
    {
     id: 'l4',
     userId: '4',
-    userName: 'Charlie Brown',
+    userName: 'Rohan Gupta',
     action: 'Offboarding Started',
     details: 'User status changed to Offboarding-In-Progress.',
     timestamp: '2023-10-10T16:00:00Z',
@@ -134,7 +134,7 @@ export const activityLogs: ActivityLog[] = [
   {
     id: 'l5',
     userId: '4',
-    userName: 'Charlie Brown',
+    userName: 'Rohan Gupta',
     action: 'Credential Revoked',
     details: 'Company Email marked as Revoked/Inactive.',
     timestamp: '2023-10-10T17:00:00Z',
