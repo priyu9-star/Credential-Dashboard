@@ -23,9 +23,8 @@ const useMockAuth = () => {
 
 
   useEffect(() => {
-    if (allUsers.length === 0) {
-       // if we have no users, we're not done loading
-       setLoading(true);
+    if (allUsers.length === 0 && loading) {
+       // if we have no users, we're not done loading yet
        return; 
     }
     try {
@@ -39,7 +38,7 @@ const useMockAuth = () => {
     } finally {
       setLoading(false);
     }
-  }, [allUsers]);
+  }, [allUsers, loading]);
 
   const login = useCallback(
     (email: string) => {
@@ -86,10 +85,10 @@ const useMockAuth = () => {
       
       const currentUser = allUsers.find((u) => u.id === storedUserId);
       if (!currentUser || (role && currentUser.role !== role)) {
-        router.replace("/");
+         logout(); // If user is invalid or role doesn't match, log them out
       }
     },
-    [router, loading, allUsers]
+    [router, loading, allUsers, logout]
   );
 
   return { user, loading, login, logout, checkAuth };
