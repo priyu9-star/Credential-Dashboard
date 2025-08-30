@@ -15,7 +15,7 @@ export async function POST(request: Request) {
     const client = await clientPromise;
     const db = client.db();
 
-    const userFromDb = await db.collection<WithId<User>>('users').findOne({ email, password });
+    const userFromDb = await db.collection('users').findOne({ email, password });
 
     if (!userFromDb) {
       return NextResponse.json({ error: 'Invalid email or password' }, { status: 401 });
