@@ -84,3 +84,8 @@ To log in as an admin, use the following credentials:
 Email: admin@example.com
 Password: admin123
 
+ChatGPT Thread Export
+During the development of this project, ChatGPT was used as a reference and guide for understanding workflow logic, UI design, tech stack selection, and implementation strategies. The complete interaction thread with ChatGPT, including suggestions and explanations, has been exported and can be accessed here
+.
+This export provides insights into design decisions, role-based feature planning, and troubleshooting approaches used while building the Credential Lifecycle Dashboard.
+
