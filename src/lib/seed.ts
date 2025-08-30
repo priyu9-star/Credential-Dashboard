@@ -25,12 +25,12 @@ const userId3 = new ObjectId("668b0132b4737d87f7584885");
 const users: Omit<User, 'id'>[] = [
   {
     _id: adminId,
-    name: 'Priya Patel',
-    email: 'priya.patel@example.com',
-    password: 'password', // In a real app, this should be hashed
+    name: 'Admin User',
+    email: 'admin@gmail.com',
+    password: '123', // In a real app, this should be hashed
     role: 'admin',
     status: 'Onboarded',
-    avatarUrl: 'https://i.pravatar.cc/150?u=priya',
+    avatarUrl: 'https://i.pravatar.cc/150?u=admin@gmail.com',
   },
   {
     _id: userId1, // Rohan Sharma
