@@ -86,7 +86,7 @@ export default function AdminDashboardPage() {
         </Card>
       </div>
 
-      <Card>
+      <Card id="users">
         <CardHeader>
             <CardTitle>User Management</CardTitle>
             <CardDescription>View user details, manage credentials, and track onboarding progress.</CardDescription>
