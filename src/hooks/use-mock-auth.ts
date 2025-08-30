@@ -42,7 +42,11 @@ const useMockAuth = () => {
 
   const login = useCallback(
     (email: string) => {
-      if (allUsers.length === 0) return;
+      // Prevent login attempts until users are loaded
+      if (allUsers.length === 0) {
+        console.log("Login deferred: User list not loaded yet.");
+        return;
+      };
       const userToLogin = allUsers.find((u) => u.email === email);
       if (userToLogin) {
         try {
