@@ -46,19 +46,15 @@ CredentiaLink/
 └── README.md            # Project documentation
 
 📋 Prerequisites
-
 Before you start, ensure you have installed:
 
 Node.js (18.x or later)
-
 npm (Node Package Manager)
-
 MongoDB
  (Local setup or MongoDB Atlas
 )
 
 ⚡ Getting Started
-
 Follow these steps to run the project locally:
 
 1️⃣ Clone the Repository
@@ -69,31 +65,22 @@ cd CredentiaLink
 npm install
 
 3️⃣ Configure Environment Variables
-
 Create a .env.local file in the root directory with your MongoDB connection string:
-
 MONGODB_URI="your_mongodb_connection_string"
-
-
 Replace your_mongodb_connection_string with your actual MongoDB URI.
 
 4️⃣ Seed the Database
-
 Load sample data for quick testing:
-
 npm run db:seed
 
 5️⃣ Start the Development Server
 npm run dev
 
-
 Your app will now run at:
 👉 http://localhost:3000
 
 🔑 Admin Credentials
-
 To log in as an admin, use the following credentials:
-
 Email: admin@example.com
 Password: admin123
 
