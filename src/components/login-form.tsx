@@ -25,6 +25,25 @@ export function LoginForm() {
       return;
     }
 
+    // Hardcoded admin check as requested
+    if (email === "admin@example.com" && password === "admin123") {
+      const adminUser: User = {
+        id: "hardcoded-admin",
+        name: "Hardcoded Admin",
+        email: "admin@example.com",
+        role: "admin",
+        status: "Onboarded",
+        avatarUrl: `https://i.pravatar.cc/150?u=admin@example.com`,
+      } as User;
+      localStorage.setItem("loggedInUser", JSON.stringify(adminUser));
+      toast({
+        title: "Login Successful",
+        description: `Welcome back, ${adminUser.name}!`,
+      });
+      router.push("/admin/dashboard");
+      return;
+    }
+
     try {
       const response = await fetch('/api/users/login', {
         method: 'POST',
