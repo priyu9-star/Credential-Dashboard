@@ -19,18 +19,24 @@ import { UserCredentialsClient } from "@/components/user/credentials-client";
 import { PageHeader } from "@/components/page-header";
 import clientPromise from "@/lib/mongodb";
 import type { User, Credential } from "@/lib/types";
+import { ObjectId } from "mongodb";
+import useMockAuth from "@/hooks/use-mock-auth";
 
-// In a real app, this would be fetched based on the logged-in user.
-const MOCK_USER_ID = "2"; 
+// In a real app, this would be fetched based on the logged-in user's session.
+// We are temporarily using a hardcoded ID that matches our seed data for Rohan Sharma.
+const MOCK_USER_ID = "668b0132b4737d87f7584883"; // This is the ObjectId for Rohan Sharma in the seed script
 
 const getUserData = async () => {
   const client = await clientPromise;
   const db = client.db();
 
-  const userRaw = await db.collection("users").findOne({ id: MOCK_USER_ID });
+  // Find user by their ObjectId
+  const userRaw = await db.collection("users").findOne({ _id: new ObjectId(MOCK_USER_ID) });
+
+  // Find credentials using the string representation of the user's _id
   const userCredentialsRaw = await db.collection("credentials").find({ userId: MOCK_USER_ID }).toArray();
   
-  const user: User | null = userRaw ? { ...userRaw, id: userRaw._id.toString() } as User : null;
+  const user: User | null = userRaw ? { ...userRaw, id: userRaw._id.toString() } as unknown as User : null;
   const userCredentials: Credential[] = userCredentialsRaw.map(c => ({...c, id: c._id.toString()})) as Credential[];
 
   return { user, userCredentials };
@@ -40,7 +46,7 @@ export default async function UserDashboardPage() {
   const { user, userCredentials } = await getUserData();
 
   if (!user) {
-    return <div>User not found.</div>;
+    return <div>User not found. Please seed the database by running `npm run db:seed`.</div>;
   }
 
   const stats = {

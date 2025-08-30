@@ -16,9 +16,15 @@ if (!uri) {
 
 const client = new MongoClient(uri);
 
+// Define ObjectIDs first so they can be referenced
+const adminId = new ObjectId("668b0132b4737d87f7584882");
+const userId1 = new ObjectId("668b0132b4737d87f7584883");
+const userId2 = new ObjectId("668b0132b4737d87f7584884");
+const userId3 = new ObjectId("668b0132b4737d87f7584885");
+
 const users: Omit<User, 'id'>[] = [
   {
-    _id: new ObjectId(),
+    _id: adminId,
     name: 'Priya Patel',
     email: 'priya.patel@example.com',
     role: 'admin',
@@ -26,7 +32,7 @@ const users: Omit<User, 'id'>[] = [
     avatarUrl: 'https://i.pravatar.cc/150?u=priya',
   },
   {
-    _id: new ObjectId(),
+    _id: userId1, // Rohan Sharma
     name: 'Rohan Sharma',
     email: 'rohan.sharma@example.com',
     role: 'user',
@@ -34,7 +40,7 @@ const users: Omit<User, 'id'>[] = [
     avatarUrl: 'https://i.pravatar.cc/150?u=rohan',
   },
   {
-    _id: new ObjectId(),
+    _id: userId2, // Ananya Singh
     name: 'Ananya Singh',
     email: 'ananya.singh@example.com',
     role: 'user',
@@ -42,7 +48,7 @@ const users: Omit<User, 'id'>[] = [
     avatarUrl: 'https://i.pravatar.cc/150?u=ananya',
   },
   {
-    _id: new ObjectId(),
+    _id: userId3, // Vikram Rao
     name: 'Vikram Rao',
     email: 'vikram.rao@example.com',
     role: 'user',
@@ -55,7 +61,7 @@ const credentials: Omit<Credential, 'id'>[] = [
   // Rohan Sharma's Credentials
   {
     _id: new ObjectId(),
-    userId: users[1]._id.toString(),
+    userId: userId1.toString(),
     name: 'GitHub',
     status: 'Assigned',
     assignedAt: new Date('2023-10-01T10:00:00Z').toISOString(),
@@ -63,7 +69,7 @@ const credentials: Omit<Credential, 'id'>[] = [
   },
   {
     _id: new ObjectId(),
-    userId: users[1]._id.toString(),
+    userId: userId1.toString(),
     name: 'Jira',
     status: 'Confirmed',
     assignedAt: new Date('2023-10-01T10:00:00Z').toISOString(),
@@ -71,7 +77,7 @@ const credentials: Omit<Credential, 'id'>[] = [
   },
   {
     _id: new ObjectId(),
-    userId: users[1]._id.toString(),
+    userId: userId1.toString(),
     name: 'Slack',
     status: 'Problem Reported',
     problemNote: "I can't seem to log in, getting an authentication error.",
@@ -81,7 +87,7 @@ const credentials: Omit<Credential, 'id'>[] = [
   // Ananya Singh's Credentials
   {
     _id: new ObjectId(),
-    userId: users[2]._id.toString(),
+    userId: userId2.toString(),
     name: 'GitHub',
     status: 'Confirmed',
     assignedAt: new Date('2023-09-15T09:00:00Z').toISOString(),
@@ -89,7 +95,7 @@ const credentials: Omit<Credential, 'id'>[] = [
   },
   {
     _id: new ObjectId(),
-    userId: users[2]._id.toString(),
+    userId: userId2.toString(),
     name: 'AWS Console',
     status: 'Confirmed',
     assignedAt: new Date('2023-09-15T09:00:00Z').toISOString(),
@@ -100,27 +106,28 @@ const credentials: Omit<Credential, 'id'>[] = [
 const activityLogs: Omit<ActivityLog, 'id'>[] = [
   {
     _id: new ObjectId(),
-    userId: users[0]._id.toString(),
+    userId: adminId.toString(),
     action: 'Assign Credential',
     timestamp: new Date('2023-10-01T10:00:00Z').toISOString(),
     details: `Assigned GitHub to Rohan Sharma`,
   },
   {
     _id: new ObjectId(),
-    userId: users[1]._id.toString(),
+    userId: userId1.toString(),
     action: 'Confirm Credential',
     timestamp: new Date('2023-10-02T11:00:00Z').toISOString(),
     details: 'Confirmed Jira access',
   },
   {
     _id: new ObjectId(),
-    userId: users[1]._id.toString(),
+    userId: userId1.toString(),
     action: 'Report Problem',
     timestamp: new Date('2023-10-03T12:00:00Z').toISOString(),
     details: 'Reported issue with Slack: "I can\'t seem to log in..."',
   },
     {
     _id: new ObjectId(),
+    userId: adminId.toString(),
     action: 'System Maintenance',
     timestamp: new Date('2023-10-05T18:00:00Z').toISOString(),
     details: 'Scheduled maintenance completed successfully.',

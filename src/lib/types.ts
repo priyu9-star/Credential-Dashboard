@@ -1,3 +1,5 @@
+import { ObjectId } from 'mongodb';
+
 export type UserRole = "admin" | "user";
 
 export type UserStatus = "Pending" | "Onboarded" | "Offboarding-In-Progress" | "Offboarded";
@@ -5,6 +7,7 @@ export type UserStatus = "Pending" | "Onboarded" | "Offboarding-In-Progress" | "
 export type CredentialStatus = "Assigned" | "Confirmed" | "Problem Reported" | "Revoked/Inactive";
 
 export interface User {
+  _id: ObjectId;
   id: string;
   name: string;
   email: string;
@@ -14,6 +17,7 @@ export interface User {
 }
 
 export interface Credential {
+  _id: ObjectId;
   id: string;
   userId: string;
   name: string;
@@ -25,6 +29,7 @@ export interface Credential {
 }
 
 export interface ActivityLog {
+  _id: ObjectId;
   id: string;
   userId?: string;
   userName?: string;

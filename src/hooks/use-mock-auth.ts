@@ -29,9 +29,9 @@ const useMockAuth = () => {
        return; 
     }
     try {
-      const storedEmail = localStorage.getItem("loggedInUser");
-      if (storedEmail) {
-        const currentUser = allUsers.find((u) => u.email === storedEmail);
+      const storedUserId = localStorage.getItem("loggedInUser");
+      if (storedUserId) {
+        const currentUser = allUsers.find((u) => u.id === storedUserId);
         setUser(currentUser || null);
       }
     } catch (error) {
@@ -47,7 +47,7 @@ const useMockAuth = () => {
       const userToLogin = allUsers.find((u) => u.email === email);
       if (userToLogin) {
         try {
-          localStorage.setItem("loggedInUser", email);
+          localStorage.setItem("loggedInUser", userToLogin.id); // Store the unique ID
           setUser(userToLogin);
           if (userToLogin.role === "admin") {
             router.push("/admin/dashboard");
@@ -77,14 +77,14 @@ const useMockAuth = () => {
     (role?: UserRole) => {
       if (loading) return; 
       
-      const storedEmail = typeof window !== 'undefined' ? localStorage.getItem("loggedInUser") : null;
+      const storedUserId = typeof window !== 'undefined' ? localStorage.getItem("loggedInUser") : null;
       
-      if (!storedEmail) {
+      if (!storedUserId) {
         router.replace("/");
         return;
       }
       
-      const currentUser = allUsers.find((u) => u.email === storedEmail);
+      const currentUser = allUsers.find((u) => u.id === storedUserId);
       if (!currentUser || (role && currentUser.role !== role)) {
         router.replace("/");
       }
