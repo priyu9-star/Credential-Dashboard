@@ -1,63 +1,99 @@
-# CredentiaLink - Credential Lifecycle Dashboard
+# 📜 CredentiaLink - Credential Lifecycle Dashboard
 
-This is a Next.js application built in Firebase Studio. It provides a dashboard for administrators to manage user credentials and for users to track the status of their assigned credentials.
+CredentiaLink is a **Next.js** application designed to simplify **credential lifecycle management**. It provides an intuitive **admin dashboard** for managing user credentials and a **user interface** for tracking credential statuses.  
 
-## Prerequisites
+This project is fully built with **Next.js**, **Node.js**, and **MongoDB**, ensuring scalability, performance, and maintainability.
 
-Before you begin, ensure you have the following installed on your local machine:
+---
 
-- **Node.js**: Version 18.x or later. You can download it from [nodejs.org](https://nodejs.org/).
-- **npm**: Node Package Manager, which comes bundled with Node.js.
-- **MongoDB**: A running MongoDB instance. You can install it locally or use a cloud-based service like [MongoDB Atlas](https://www.mongodb.com/cloud/atlas).
+## 🚀 Features
 
-## Getting Started
+- 🔐 **Admin Dashboard**: Manage user credentials, monitor activities, and maintain records.  
+- 👤 **User Portal**: Users can view and track the status of their assigned credentials.  
+- 🌐 **Modern Frontend**: Built with Next.js for SEO optimization and fast rendering.  
+- 📦 **MongoDB Integration**: Reliable database support for secure data management.  
+- 🧩 **Modular Project Structure**: Easy-to-read codebase for developers.  
+- ⚙️ **Environment Configurations**: Secure environment variable management with `.env.local`.  
+- 📊 **Database Seeding**: Preloaded sample data for testing and quick setup.  
 
-Follow these steps to get your local development environment set up and running.
+---
 
-### 1. Install Dependencies
+## 🛠️ Tech Stack
 
-Navigate to the project's root directory in your terminal and run the following command to install all the required packages listed in `package.json`:
+| Technology | Purpose |
+|------------|---------|
+| **Next.js** | Frontend framework |
+| **MongoDB** | Database |
+| **Node.js** | Backend runtime |
+| **npm** | Package manager |
+| **TypeScript** | Strong typing support for maintainable code |
 
-```bash
+---
+
+## 📂 Project Structure
+
+```plaintext
+CredentiaLink/
+├── src/
+│   ├── components/      # UI components
+│   ├── lib/             # Database connection, utility functions, and seed script
+│   ├── pages/           # Next.js pages
+│   ├── styles/          # Styling files
+│   └── ...              
+├── public/              # Static assets (images, icons)
+├── .env.local           # Environment variables
+├── package.json         # Dependencies & scripts
+└── README.md            # Project documentation
+
+📋 Prerequisites
+
+Before you start, ensure you have installed:
+
+Node.js (18.x or later)
+
+npm (Node Package Manager)
+
+MongoDB
+ (Local setup or MongoDB Atlas
+)
+
+⚡ Getting Started
+
+Follow these steps to run the project locally:
+
+1️⃣ Clone the Repository
+git clone https://github.com/<your-username>/CredentiaLink.git
+cd CredentiaLink
+
+2️⃣ Install Dependencies
 npm install
-```
 
-### 2. Configure Environment Variables
+3️⃣ Configure Environment Variables
 
-You need to connect the application to your MongoDB instance. To do this, create a new file named `.env.local` in the root of the project.
+Create a .env.local file in the root directory with your MongoDB connection string:
 
-Inside `.env.local`, add your MongoDB connection string. It should look like this:
+MONGODB_URI="your_mongodb_connection_string"
 
-```
-MONGODB_URI="your_mongodb_connection_string_goes_here"
-```
 
-Replace `"your_mongodb_connection_string_goes_here"` with the actual connection string for your database.
+Replace your_mongodb_connection_string with your actual MongoDB URI.
 
-### 3. Seed the Database
+4️⃣ Seed the Database
 
-The project includes a seed script to populate your database with initial sample data (users, credentials, etc.). Run the following command in your terminal:
+Load sample data for quick testing:
 
-```bash
 npm run db:seed
-```
 
-This will clear any existing data and insert the sample records defined in `src/lib/seed.ts`.
-
-### 4. Run the Development Server
-
-Once the dependencies are installed and the database is seeded, you can start the application's development server:
-
-```bash
+5️⃣ Start the Development Server
 npm run dev
-```
 
-The application will now be running and accessible at [http://localhost:3000](http://localhost:3000).
 
-## Available Scripts
+Your app will now run at:
+👉 http://localhost:3000
 
-- `npm run dev`: Starts the application in development mode.
-- `npm run build`: Creates a production-ready build of the application.
-- `npm run start`: Starts the application in production mode (requires a build first).
-- `npm run lint`: Lints the project files for code quality.
-- `npm run db:seed`: Clears and seeds the database with initial data.
+🔑 Admin Credentials
+
+To log in as an admin, use the following credentials:
+
+Email: admin@example.com
+Password: admin123
+
