@@ -1,3 +1,8 @@
+
+"use client";
+
+import { useEffect, useState } from 'react';
+import type { User, Credential } from "@/lib/types";
 import {
   Card,
   CardContent,
@@ -17,43 +22,76 @@ import {
 
 import { UserCredentialsClient } from "@/components/user/credentials-client";
 import { PageHeader } from "@/components/page-header";
-import clientPromise from "@/lib/mongodb";
-import type { User, Credential } from "@/lib/types";
-import { ObjectId } from "mongodb";
-import useMockAuth from "@/hooks/use-mock-auth";
+import { Logo } from '@/components/icons';
 
-// In a real app, this would be fetched based on the logged-in user's session.
-// We are temporarily using a hardcoded ID that matches our seed data for Rohan Sharma.
-const MOCK_USER_ID = "668b0132b4737d87f7584883"; // This is the ObjectId for Rohan Sharma in the seed script
 
-const getUserData = async () => {
-  const client = await clientPromise;
-  const db = client.db();
-
-  // Find user by their ObjectId
-  const userRaw = await db.collection("users").findOne({ _id: new ObjectId(MOCK_USER_ID) });
-
-  // Find credentials using the string representation of the user's _id
-  const userCredentialsRaw = await db.collection("credentials").find({ userId: MOCK_USER_ID }).toArray();
+export default function UserDashboardPage() {
+  const [user, setUser] = useState<User | null>(null);
+  const [credentials, setCredentials] = useState<Credential[]>([]);
+  const [loading, setLoading] = useState(true);
   
-  const user: User | null = userRaw ? { ...userRaw, id: userRaw._id.toString() } as unknown as User : null;
-  const userCredentials: Credential[] = userCredentialsRaw.map(c => ({...c, id: c._id.toString()})) as Credential[];
+  useEffect(() => {
+    const userJson = localStorage.getItem('loggedInUser');
+    if (!userJson) {
+      // Redirect or handle not-logged-in state
+      return;
+    }
+    const currentUser: User = JSON.parse(userJson);
+    setUser(currentUser);
 
-  return { user, userCredentials };
-};
+    const fetchCredentials = async () => {
+      // This is not ideal for production. We should be using an API route with auth.
+      // For this prototype, we'll fetch all and filter on the client.
+      const res = await fetch('/api/credentials'); // This endpoint doesn't exist yet
+      if (res.ok) {
+        const allCredentials = await res.json();
+        const userCredentials = allCredentials.filter((c: Credential) => c.userId === currentUser.id);
+        setCredentials(userCredentials);
+      }
+      setLoading(false);
+    }
+    
+    // For now, let's use the seeded data logic until the credentials API is ready
+    const fetchSeededCredentials = async () => {
+        try {
+            const res = await fetch(`/api/users/${currentUser.id}/credentials`);
+            if(res.ok) {
+                const data = await res.json();
+                setCredentials(data.credentials);
+            }
+        } catch (e) {
+            console.error("Failed to fetch credentials", e)
+        } finally {
+            setLoading(false);
+        }
+    }
 
-export default async function UserDashboardPage() {
-  const { user, userCredentials } = await getUserData();
+
+    fetchSeededCredentials();
+
+  }, []);
+
+
+  if (loading) {
+    return (
+      <div className="flex h-full w-full items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <Logo className="h-12 w-12 animate-pulse" />
+          <p className="text-muted-foreground">Loading dashboard...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!user) {
-    return <div>User not found. Please seed the database by running `npm run db:seed`.</div>;
+    return <div>User not found. Please log in.</div>;
   }
 
   const stats = {
-    assigned: userCredentials.filter((c) => c.status === "Assigned").length,
-    confirmed: userCredentials.filter((c) => c.status === "Confirmed").length,
-    problem: userCredentials.filter((c) => c.status === "Problem Reported").length,
-    revoked: userCredentials.filter((c) => c.status === "Revoked/Inactive").length,
+    assigned: credentials.filter((c) => c.status === "Assigned").length,
+    confirmed: credentials.filter((c) => c.status === "Confirmed").length,
+    problem: credentials.filter((c) => c.status === "Problem Reported").length,
+    revoked: credentials.filter((c) => c.status === "Revoked/Inactive").length,
   };
 
   const statusInfo = {
@@ -115,7 +153,7 @@ export default async function UserDashboardPage() {
         </Card>
       </div>
 
-      <UserCredentialsClient initialCredentials={userCredentials} />
+      <UserCredentialsClient initialCredentials={credentials} />
       
     </div>
   );

@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import useMockAuth from '@/hooks/use-mock-auth';
+import { usePathname, useRouter } from 'next/navigation';
+import type { User } from '@/lib/types';
 import {
   SidebarProvider,
   Sidebar,
@@ -17,7 +17,6 @@ import {
   SidebarFooter,
 } from '@/components/ui/sidebar';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Skeleton } from '@/components/ui/skeleton';
 import { Logo } from '@/components/icons';
 import { LayoutDashboard, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -27,12 +26,30 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { user, loading, checkAuth, logout } = useMockAuth();
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+  const router = useRouter();
   const pathname = usePathname();
   
   useEffect(() => {
-    checkAuth('user');
-  }, [checkAuth]);
+    const userJson = localStorage.getItem('loggedInUser');
+    if (userJson) {
+      const currentUser = JSON.parse(userJson);
+      if (currentUser && currentUser.role === 'user') {
+        setUser(currentUser);
+      } else {
+        router.push('/'); // Not a user, redirect
+      }
+    } else {
+       router.push('/'); // Not logged in, redirect
+    }
+    setLoading(false);
+  }, [router]);
+
+  const logout = () => {
+    localStorage.removeItem('loggedInUser');
+    router.push('/');
+  };
 
   if (loading || !user) {
     return (

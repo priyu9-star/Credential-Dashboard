@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import useMockAuth from '@/hooks/use-mock-auth';
+import { usePathname, useRouter } from 'next/navigation';
+import type { User } from '@/lib/types';
 import {
   SidebarProvider,
   Sidebar,
@@ -26,12 +26,30 @@ export default function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { user, loading, checkAuth, logout } = useMockAuth();
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+  const router = useRouter();
   const pathname = usePathname();
   
   useEffect(() => {
-    checkAuth('admin');
-  }, [checkAuth]);
+    const userJson = localStorage.getItem('loggedInUser');
+    if (userJson) {
+      const currentUser = JSON.parse(userJson);
+      if (currentUser && currentUser.role === 'admin') {
+        setUser(currentUser);
+      } else {
+        router.push('/'); // Not an admin, redirect
+      }
+    } else {
+       router.push('/'); // Not logged in, redirect
+    }
+    setLoading(false);
+  }, [router]);
+
+  const logout = () => {
+    localStorage.removeItem('loggedInUser');
+    router.push('/');
+  };
 
   if (loading || !user) {
      return (
