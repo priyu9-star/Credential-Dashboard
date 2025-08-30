@@ -1,6 +1,8 @@
+
 import { NextResponse } from 'next/server';
 import clientPromise from '@/lib/mongodb';
 import type { User } from '@/lib/types';
+import { WithId } from 'mongodb';
 
 export async function POST(request: Request) {
   try {
@@ -13,21 +15,23 @@ export async function POST(request: Request) {
     const client = await clientPromise;
     const db = client.db();
 
-    const userFromDb = await db.collection('users').findOne({ email, password });
+    const userFromDb = await db.collection<WithId<User>>('users').findOne({ email, password });
 
     if (!userFromDb) {
       return NextResponse.json({ error: 'Invalid email or password' }, { status: 401 });
     }
     
-    // Ensure the response has a string 'id'
-    const user: User = { 
-        ...userFromDb, 
-        id: userFromDb._id.toString() 
-    } as unknown as User;
-
-    // Don't return the password
-    delete user.password;
-
+    // Explicitly map fields to ensure correct types, especially converting ObjectId to string
+    const user: Partial<User> = {
+        id: userFromDb._id.toString(),
+        name: userFromDb.name,
+        email: userFromDb.email,
+        role: userFromDb.role,
+        status: userFromDb.status,
+        avatarUrl: userFromDb.avatarUrl,
+    };
+    
+    // The password is not included in the new user object, so no need to delete it.
 
     return NextResponse.json({ user });
 
