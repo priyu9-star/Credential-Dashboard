@@ -27,6 +27,7 @@ const users: Omit<User, 'id'>[] = [
     _id: adminId,
     name: 'Priya Patel',
     email: 'priya.patel@example.com',
+    password: 'password', // In a real app, this should be hashed
     role: 'admin',
     status: 'Onboarded',
     avatarUrl: 'https://i.pravatar.cc/150?u=priya',
@@ -35,6 +36,7 @@ const users: Omit<User, 'id'>[] = [
     _id: userId1, // Rohan Sharma
     name: 'Rohan Sharma',
     email: 'rohan.sharma@example.com',
+    password: 'password', // In a real app, this should be hashed
     role: 'user',
     status: 'Pending',
     avatarUrl: 'https://i.pravatar.cc/150?u=rohan',
@@ -43,6 +45,7 @@ const users: Omit<User, 'id'>[] = [
     _id: userId2, // Ananya Singh
     name: 'Ananya Singh',
     email: 'ananya.singh@example.com',
+    password: 'password', // In a real app, this should be hashed
     role: 'user',
     status: 'Onboarded',
     avatarUrl: 'https://i.pravatar.cc/150?u=ananya',
@@ -51,6 +54,7 @@ const users: Omit<User, 'id'>[] = [
     _id: userId3, // Vikram Rao
     name: 'Vikram Rao',
     email: 'vikram.rao@example.com',
+    password: 'password', // In a real app, this should be hashed
     role: 'user',
     status: 'Offboarded',
     avatarUrl: 'https://i.pravatar.cc/150?u=vikram',

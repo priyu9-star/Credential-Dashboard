@@ -19,7 +19,9 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const getAll = searchParams.get('all');
 
-    const usersFromDb = await db.collection('users').find({}).toArray();
+    // Make sure to not include password in the response
+    const usersFromDb = await db.collection('users').find({}, { projection: { password: 0 } }).toArray();
+    
     const users: User[] = usersFromDb.map(u => ({ ...u, id: u._id.toString() })) as User[];
     
     if (getAll) {

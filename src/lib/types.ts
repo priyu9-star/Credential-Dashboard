@@ -11,6 +11,7 @@ export interface User {
   id: string;
   name: string;
   email: string;
+  password?: string; // Should be handled securely, not stored in plaintext in a real app
   role: UserRole;
   status: UserStatus;
   avatarUrl: string;

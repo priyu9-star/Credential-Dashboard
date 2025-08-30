@@ -19,12 +19,13 @@ const useMockAuth = () => {
       setAllUsers(data.users);
     }
     fetchUsers();
-  }, [])
+  }, []);
 
 
   useEffect(() => {
     if (allUsers.length === 0 && loading) {
        // if we have no users, we're not done loading yet
+       // but if we are not loading, it means there are no users in DB
        return; 
     }
     try {
@@ -41,13 +42,17 @@ const useMockAuth = () => {
   }, [allUsers, loading]);
 
   const login = useCallback(
-    (email: string) => {
+    (email: string, password?: string) => {
       // Prevent login attempts until users are loaded
       if (allUsers.length === 0) {
         console.log("Login deferred: User list not loaded yet.");
+        // We could also add a retry mechanism here
+        setTimeout(() => login(email, password), 500);
         return;
       };
-      const userToLogin = allUsers.find((u) => u.email === email);
+      
+      const userToLogin = allUsers.find((u) => u.email === email && u.password === password);
+
       if (userToLogin) {
         try {
           localStorage.setItem("loggedInUser", userToLogin.id); // Store the unique ID
