@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import useMockAuth from "@/hooks/use-mock-auth";
@@ -49,7 +48,7 @@ export function LoginForm() {
             </SelectTrigger>
             <SelectContent>
               {users.map((user) => (
-                <SelectItem key={`${user.id}-${user.email}`} value={user.email}>
+                <SelectItem key={user.id} value={user.email}>
                   {user.email} ({user.role})
                 </SelectItem>
               ))}

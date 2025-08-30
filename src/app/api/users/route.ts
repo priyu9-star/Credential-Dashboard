@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import clientPromise from '@/lib/mongodb';
 import type { User, Credential } from '@/lib/types';
+import { ObjectId } from 'mongodb';
 
 type UserWithCounts = User & {
   credentialCounts: {
@@ -18,13 +19,15 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const getAll = searchParams.get('all');
 
-    const users = await db.collection<User>('users').find({}).toArray();
+    const usersFromDb = await db.collection('users').find({}).toArray();
+    const users: User[] = usersFromDb.map(u => ({ ...u, id: u._id.toString() })) as User[];
     
     if (getAll) {
-        return NextResponse.json({ users: JSON.parse(JSON.stringify(users)) });
+        return NextResponse.json({ users });
     }
 
-    const credentials = await db.collection<Credential>('credentials').find({}).toArray();
+    const credentialsFromDb = await db.collection('credentials').find({}).toArray();
+    const credentials: Credential[] = credentialsFromDb.map(c => ({...c, id: c._id.toString() })) as Credential[];
 
     const usersWithCounts: UserWithCounts[] = users
       .filter(user => user.role === 'user')
@@ -41,7 +44,7 @@ export async function GET(request: Request) {
         };
       });
 
-    return NextResponse.json({ usersWithCounts: JSON.parse(JSON.stringify(usersWithCounts)) });
+    return NextResponse.json({ usersWithCounts });
   } catch (e) {
     console.error(e);
     return NextResponse.json({ error: 'Failed to fetch users' }, { status: 500 });

@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import type { User, UserRole } from "@/lib/types";
-// import { users } from "@/lib/data"; // No longer using mock data
 
 const useMockAuth = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -15,7 +14,6 @@ const useMockAuth = () => {
   useEffect(() => {
     async function fetchUsers() {
       // In a real app, you'd have an API endpoint for this.
-      // For now, we'll create one.
       const res = await fetch('/api/users?all=true');
       const data = await res.json();
       setAllUsers(data.users);

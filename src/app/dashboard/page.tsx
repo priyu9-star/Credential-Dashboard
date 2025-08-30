@@ -27,9 +27,12 @@ const getUserData = async () => {
   const client = await clientPromise;
   const db = client.db();
 
-  const user = await db.collection<User>("users").findOne({ id: MOCK_USER_ID });
-  const userCredentials = await db.collection<Credential>("credentials").find({ userId: MOCK_USER_ID }).toArray();
+  const userRaw = await db.collection("users").findOne({ id: MOCK_USER_ID });
+  const userCredentialsRaw = await db.collection("credentials").find({ userId: MOCK_USER_ID }).toArray();
   
+  const user: User | null = userRaw ? { ...userRaw, id: userRaw._id.toString() } as User : null;
+  const userCredentials: Credential[] = userCredentialsRaw.map(c => ({...c, id: c._id.toString()})) as Credential[];
+
   return { user, userCredentials };
 };
 
@@ -55,7 +58,6 @@ export default async function UserDashboardPage() {
   };
   
   const CurrentStatusIcon = statusInfo[user.status].icon;
-  const plainCredentials = JSON.parse(JSON.stringify(userCredentials));
 
   return (
     <div className="space-y-6">
@@ -107,7 +109,7 @@ export default async function UserDashboardPage() {
         </Card>
       </div>
 
-      <UserCredentialsClient initialCredentials={plainCredentials} />
+      <UserCredentialsClient initialCredentials={userCredentials} />
       
     </div>
   );

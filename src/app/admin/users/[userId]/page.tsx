@@ -5,15 +5,18 @@ import Link from "next/link";
 import { UserCredentialsManager } from "@/components/admin/user-credentials-manager";
 import clientPromise from "@/lib/mongodb";
 import type { User, Credential, ActivityLog } from "@/lib/types";
-import { ObjectId } from "mongodb";
 
 const getUserData = async (userId: string) => {
   const client = await clientPromise;
   const db = client.db();
 
-  const user = await db.collection<User>("users").findOne({ id: userId });
-  const userCredentials = await db.collection<Credential>("credentials").find({ userId: userId }).toArray();
-  const userActivity = await db.collection<ActivityLog>("activityLogs").find({ userId: userId }).toArray();
+  const userRaw = await db.collection("users").findOne({ id: userId });
+  const userCredentialsRaw = await db.collection("credentials").find({ userId: userId }).toArray();
+  const userActivityRaw = await db.collection("activityLogs").find({ userId: userId }).toArray();
+
+  const user: User | null = userRaw ? { ...userRaw, id: userRaw._id.toString() } as User : null;
+  const userCredentials: Credential[] = userCredentialsRaw.map(c => ({ ...c, id: c._id.toString() })) as Credential[];
+  const userActivity: ActivityLog[] = userActivityRaw.map(a => ({ ...a, id: a._id.toString() })) as ActivityLog[];
   
   return { user, userCredentials, userActivity };
 };
@@ -36,11 +39,6 @@ export default async function AdminUserDetailPage({ params }: { params: { userId
     );
   }
 
-  const plainUser = JSON.parse(JSON.stringify(user));
-  const plainCredentials = JSON.parse(JSON.stringify(userCredentials));
-  const plainActivity = JSON.parse(JSON.stringify(userActivity));
-
-
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
@@ -62,7 +60,7 @@ export default async function AdminUserDetailPage({ params }: { params: { userId
         </div>
       </div>
 
-      <UserCredentialsManager user={plainUser} initialCredentials={plainCredentials} initialActivity={plainActivity} />
+      <UserCredentialsManager user={user} initialCredentials={userCredentials} initialActivity={userActivity} />
 
     </div>
   );

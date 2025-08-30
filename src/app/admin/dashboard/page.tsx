@@ -23,9 +23,11 @@ import type { User, Credential } from "@/lib/types";
 const getDashboardData = async () => {
   const client = await clientPromise;
   const db = client.db();
-  const users = await db.collection<User>("users").find({}).toArray();
-  const credentials = await db.collection<Credential>("credentials").find({}).toArray();
+  const usersRaw = await db.collection("users").find({}).toArray();
+  const credentialsRaw = await db.collection("credentials").find({}).toArray();
 
+  const users: User[] = usersRaw.map(u => ({...u, id: u._id.toString()})) as User[];
+  const credentials: Credential[] = credentialsRaw.map(c => ({...c, id: c._id.toString()})) as Credential[];
 
   const totalUsers = users.filter(u => u.role === 'user').length;
   const pendingUsers = users.filter(u => u.status === 'Pending').length;

@@ -23,8 +23,11 @@ import type { User, ActivityLog } from "@/lib/types";
 async function getLogs() {
     const client = await clientPromise;
     const db = client.db();
-    const activityLogs = await db.collection<ActivityLog>("activityLogs").find({}).toArray();
-    const users = await db.collection<User>("users").find({}).toArray();
+    const activityLogsRaw = await db.collection("activityLogs").find({}).toArray();
+    const usersRaw = await db.collection("users").find({}).toArray();
+
+    const activityLogs: ActivityLog[] = activityLogsRaw.map(l => ({ ...l, id: l._id.toString() })) as ActivityLog[];
+    const users: User[] = usersRaw.map(u => ({ ...u, id: u._id.toString() })) as User[];
     
     const logsWithUsers = activityLogs.map(log => {
         const user = users.find(u => u.id === log.userId);
