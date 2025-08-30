@@ -28,9 +28,15 @@ const getUserData = async (userId: string) => {
   const userCredentialsRaw = await db.collection("credentials").find({ userId: userStringId }).toArray();
   const userActivityRaw = await db.collection("activityLogs").find({ userId: userStringId }).toArray();
 
-  const user: User | null = userRaw ? { ...userRaw, id: userRaw._id.toString() } as unknown as User : null;
-  const userCredentials: Credential[] = userCredentialsRaw.map(c => ({ ...c, id: c._id.toString() })) as unknown as Credential[];
-  const userActivity: ActivityLog[] = userActivityRaw.map(a => ({ ...a, id: a._id.toString() })) as unknown as ActivityLog[];
+  const user: User | null = userRaw ? { 
+      ...userRaw, 
+      id: userRaw._id.toString(),
+      // Ensure _id is also a string for serialization
+      _id: userRaw._id.toString() 
+    } as unknown as User : null;
+
+  const userCredentials: Credential[] = userCredentialsRaw.map(c => ({ ...c, id: c._id.toString(), _id: c._id.toString() })) as unknown as Credential[];
+  const userActivity: ActivityLog[] = userActivityRaw.map(a => ({ ...a, id: a._id.toString(), _id: a._id.toString() })) as unknown as ActivityLog[];
   
   return { user, userCredentials, userActivity };
 };
