@@ -49,7 +49,7 @@ export function LoginForm() {
             </SelectTrigger>
             <SelectContent>
               {users.map((user) => (
-                <SelectItem key={user.id} value={user.email}>
+                <SelectItem key={`${user.id}-${user.email}`} value={user.email}>
                   {user.email} ({user.role})
                 </SelectItem>
               ))}
