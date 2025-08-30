@@ -50,32 +50,44 @@ const useMockAuth = () => {
 
   const login = useCallback(
     async (email: string, password?: string) => {
-      let userToLogin = allUsers.find((u) => u.email === email && u.password === password);
+      try {
+        const response = await fetch('/api/users/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email, password }),
+        });
 
-      if (!userToLogin) {
-        const freshUsers = await fetchUsers();
-        userToLogin = freshUsers.find((u: User) => u.email === email && u.password === password);
-      }
+        const data = await response.json();
 
-      if (userToLogin) {
-        try {
-          localStorage.setItem("loggedInUser", userToLogin.id);
-          setUser(userToLogin);
-          if (userToLogin.role === "admin") {
-            router.push("/admin/dashboard");
-          } else {
-            router.push("/dashboard");
-          }
-        } catch (error) {
-          console.error("Could not access localStorage", error);
+        if (!response.ok) {
+          throw new Error(data.error || 'Login failed');
         }
-        return userToLogin;
+        
+        const userToLogin = data.user;
+
+        if (userToLogin) {
+          try {
+            localStorage.setItem("loggedInUser", userToLogin.id);
+            setUser(userToLogin);
+            if (userToLogin.role === "admin") {
+              router.push("/admin/dashboard");
+            } else {
+              router.push("/dashboard");
+            }
+          } catch (error) {
+            console.error("Could not access localStorage", error);
+          }
+          return userToLogin;
+        }
+      } catch (error) {
+         console.error('Login error:', error);
+         return null;
       }
-      
-      // Explicitly return null if login fails
-      return null;
+       return null;
     },
-    [router, allUsers, fetchUsers]
+    [router]
   );
 
   const logout = useCallback(() => {
