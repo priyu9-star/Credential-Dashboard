@@ -2,7 +2,6 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { users as allUsers, credentials as allCredentials } from "@/lib/data";
 import type { User, UserStatus } from "@/lib/types";
 import {
   Table,
@@ -16,6 +15,10 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { ChevronRight } from "lucide-react";
+// This component is now client-side, but needs data from the server.
+// We'll fetch it in an effect. A better approach for production would be
+// to pass this data as props from a Server Component parent.
+import {useEffect, useState} from 'react';
 
 type UserWithCounts = User & {
   credentialCounts: {
@@ -35,20 +38,19 @@ const statusColors: Record<UserStatus, string> = {
 
 
 export function UsersTable() {
-  const usersWithCounts: UserWithCounts[] = allUsers
-  .filter(user => user.role === 'user')
-  .map(user => {
-    const userCredentials = allCredentials.filter(c => c.userId === user.id);
-    return {
-      ...user,
-      credentialCounts: {
-        assigned: userCredentials.filter(c => c.status === 'Assigned').length,
-        confirmed: userCredentials.filter(c => c.status === 'Confirmed').length,
-        problem: userCredentials.filter(c => c.status === 'Problem Reported').length,
-        revoked: userCredentials.filter(c => c.status === 'Revoked/Inactive').length,
-      }
-    };
-  });
+  const [usersWithCounts, setUsersWithCounts] = useState<UserWithCounts[]>([]);
+  
+  useEffect(() => {
+    async function fetchData() {
+      // This is not ideal for production. We should be using an API route.
+      // For this prototype, we'll fetch directly on the client.
+      const res = await fetch('/api/users');
+      const data = await res.json();
+      setUsersWithCounts(data.usersWithCounts);
+    }
+    fetchData();
+  }, []);
+
 
   return (
     <div className="overflow-x-auto">
@@ -104,3 +106,4 @@ export function UsersTable() {
     </div>
   );
 }
+

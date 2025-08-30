@@ -1,18 +1,28 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import useMockAuth from "@/hooks/use-mock-auth";
-import { users } from "@/lib/data";
+import type { User } from "@/lib/types";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 
 export function LoginForm() {
   const [email, setEmail] = useState("");
   const { login } = useMockAuth();
   const { toast } = useToast();
+  const [users, setUsers] = useState<User[]>([]);
+
+  useEffect(() => {
+    async function fetchUsers() {
+      const res = await fetch('/api/users?all=true');
+      const data = await res.json();
+      setUsers(data.users);
+    }
+    fetchUsers();
+  }, []);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

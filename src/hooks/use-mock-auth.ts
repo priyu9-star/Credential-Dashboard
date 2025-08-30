@@ -3,18 +3,33 @@
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import type { User, UserRole } from "@/lib/types";
-import { users } from "@/lib/data";
+// import { users } from "@/lib/data"; // No longer using mock data
 
 const useMockAuth = () => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
+  // Fetch all users once to simulate auth checking
+  const [allUsers, setAllUsers] = useState<User[]>([]);
   useEffect(() => {
+    async function fetchUsers() {
+      // In a real app, you'd have an API endpoint for this.
+      // For now, we'll create one.
+      const res = await fetch('/api/users?all=true');
+      const data = await res.json();
+      setAllUsers(data.users);
+    }
+    fetchUsers();
+  }, [])
+
+
+  useEffect(() => {
+    if (allUsers.length === 0) return; // Wait until users are fetched
     try {
       const storedEmail = localStorage.getItem("loggedInUser");
       if (storedEmail) {
-        const currentUser = users.find((u) => u.email === storedEmail);
+        const currentUser = allUsers.find((u) => u.email === storedEmail);
         setUser(currentUser || null);
       }
     } catch (error) {
@@ -22,11 +37,12 @@ const useMockAuth = () => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [allUsers]);
 
   const login = useCallback(
     (email: string) => {
-      const userToLogin = users.find((u) => u.email === email);
+      if (allUsers.length === 0) return;
+      const userToLogin = allUsers.find((u) => u.email === email);
       if (userToLogin) {
         try {
           localStorage.setItem("loggedInUser", email);
@@ -42,7 +58,7 @@ const useMockAuth = () => {
       }
       return userToLogin;
     },
-    [router]
+    [router, allUsers]
   );
 
   const logout = useCallback(() => {
@@ -57,19 +73,19 @@ const useMockAuth = () => {
 
   const checkAuth = useCallback(
     (role?: UserRole) => {
-      if (loading) return; // Don't redirect while loading
+      if (loading || allUsers.length === 0) return; // Don't redirect while loading
       const storedEmail = typeof window !== 'undefined' ? localStorage.getItem("loggedInUser") : null;
       if (!storedEmail) {
         router.replace("/");
         return;
       }
       
-      const currentUser = users.find((u) => u.email === storedEmail);
+      const currentUser = allUsers.find((u) => u.email === storedEmail);
       if (!currentUser || (role && currentUser.role !== role)) {
         router.replace("/");
       }
     },
-    [router, loading]
+    [router, loading, allUsers]
   );
 
   return { user, loading, login, logout, checkAuth };

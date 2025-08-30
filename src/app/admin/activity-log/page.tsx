@@ -14,13 +14,18 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { activityLogs } from "@/lib/data";
 import { format } from 'date-fns';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { users } from "@/lib/data";
 import { Badge } from "@/components/ui/badge";
+import clientPromise from "@/lib/mongodb";
+import type { User, ActivityLog } from "@/lib/types";
 
-export default function ActivityLogPage() {
+async function getLogs() {
+    const client = await clientPromise;
+    const db = client.db();
+    const activityLogs = await db.collection<ActivityLog>("activityLogs").find({}).toArray();
+    const users = await db.collection<User>("users").find({}).toArray();
+    
     const logsWithUsers = activityLogs.map(log => {
         const user = users.find(u => u.id === log.userId);
         return {
@@ -28,6 +33,13 @@ export default function ActivityLogPage() {
             user,
         }
     }).sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+
+    return logsWithUsers;
+}
+
+
+export default async function ActivityLogPage() {
+  const logsWithUsers = await getLogs();
 
   return (
     <div className="space-y-6">

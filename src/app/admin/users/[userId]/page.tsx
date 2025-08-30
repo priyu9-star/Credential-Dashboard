@@ -1,21 +1,26 @@
-import { users, credentials, activityLogs } from "@/lib/data";
 import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, FileDown } from "lucide-react";
 import Link from "next/link";
 import { UserCredentialsManager } from "@/components/admin/user-credentials-manager";
+import clientPromise from "@/lib/mongodb";
+import type { User, Credential, ActivityLog } from "@/lib/types";
+import { ObjectId } from "mongodb";
 
-const getUserData = (userId: string) => {
-  const user = users.find((u) => u.id === userId);
-  const userCredentials = credentials.filter((c) => c.userId === userId);
-  const userActivity = activityLogs.filter(log => log.userId === userId);
+const getUserData = async (userId: string) => {
+  const client = await clientPromise;
+  const db = client.db();
 
+  const user = await db.collection<User>("users").findOne({ id: userId });
+  const userCredentials = await db.collection<Credential>("credentials").find({ userId: userId }).toArray();
+  const userActivity = await db.collection<ActivityLog>("activityLogs").find({ userId: userId }).toArray();
+  
   return { user, userCredentials, userActivity };
 };
 
 
-export default function AdminUserDetailPage({ params }: { params: { userId: string } }) {
-  const { user, userCredentials, userActivity } = getUserData(params.userId);
+export default async function AdminUserDetailPage({ params }: { params: { userId: string } }) {
+  const { user, userCredentials, userActivity } = await getUserData(params.userId);
 
   if (!user) {
     return (
@@ -30,6 +35,11 @@ export default function AdminUserDetailPage({ params }: { params: { userId: stri
       </div>
     );
   }
+
+  const plainUser = JSON.parse(JSON.stringify(user));
+  const plainCredentials = JSON.parse(JSON.stringify(userCredentials));
+  const plainActivity = JSON.parse(JSON.stringify(userActivity));
+
 
   return (
     <div className="space-y-6">
@@ -52,7 +62,7 @@ export default function AdminUserDetailPage({ params }: { params: { userId: stri
         </div>
       </div>
 
-      <UserCredentialsManager user={user} initialCredentials={userCredentials} initialActivity={userActivity} />
+      <UserCredentialsManager user={plainUser} initialCredentials={plainCredentials} initialActivity={plainActivity} />
 
     </div>
   );

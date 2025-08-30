@@ -15,21 +15,26 @@ import {
   ClipboardX,
 } from "lucide-react";
 
-import { credentials, users } from "@/lib/data";
 import { UserCredentialsClient } from "@/components/user/credentials-client";
 import { PageHeader } from "@/components/page-header";
+import clientPromise from "@/lib/mongodb";
+import type { User, Credential } from "@/lib/types";
 
 // In a real app, this would be fetched based on the logged-in user.
 const MOCK_USER_ID = "2"; 
 
-const getUserData = () => {
-  const user = users.find((u) => u.id === MOCK_USER_ID);
-  const userCredentials = credentials.filter((c) => c.userId === MOCK_USER_ID);
+const getUserData = async () => {
+  const client = await clientPromise;
+  const db = client.db();
+
+  const user = await db.collection<User>("users").findOne({ id: MOCK_USER_ID });
+  const userCredentials = await db.collection<Credential>("credentials").find({ userId: MOCK_USER_ID }).toArray();
+  
   return { user, userCredentials };
 };
 
-export default function UserDashboardPage() {
-  const { user, userCredentials } = getUserData();
+export default async function UserDashboardPage() {
+  const { user, userCredentials } = await getUserData();
 
   if (!user) {
     return <div>User not found.</div>;
@@ -50,6 +55,7 @@ export default function UserDashboardPage() {
   };
   
   const CurrentStatusIcon = statusInfo[user.status].icon;
+  const plainCredentials = JSON.parse(JSON.stringify(userCredentials));
 
   return (
     <div className="space-y-6">
@@ -101,7 +107,7 @@ export default function UserDashboardPage() {
         </Card>
       </div>
 
-      <UserCredentialsClient initialCredentials={userCredentials} />
+      <UserCredentialsClient initialCredentials={plainCredentials} />
       
     </div>
   );

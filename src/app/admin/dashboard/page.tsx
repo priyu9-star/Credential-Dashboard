@@ -14,12 +14,19 @@ import {
   FileDown,
 } from "lucide-react";
 
-import { users, credentials } from "@/lib/data";
 import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import { UsersTable } from "@/components/admin/users-table";
+import clientPromise from "@/lib/mongodb";
+import type { User, Credential } from "@/lib/types";
 
-const getDashboardData = () => {
+const getDashboardData = async () => {
+  const client = await clientPromise;
+  const db = client.db();
+  const users = await db.collection<User>("users").find({}).toArray();
+  const credentials = await db.collection<Credential>("credentials").find({}).toArray();
+
+
   const totalUsers = users.filter(u => u.role === 'user').length;
   const pendingUsers = users.filter(u => u.status === 'Pending').length;
   const onboardedUsers = users.filter(u => u.status === 'Onboarded').length;
@@ -28,8 +35,8 @@ const getDashboardData = () => {
   return { totalUsers, pendingUsers, onboardedUsers, problemCredentials };
 };
 
-export default function AdminDashboardPage() {
-  const { totalUsers, pendingUsers, onboardedUsers, problemCredentials } = getDashboardData();
+export default async function AdminDashboardPage() {
+  const { totalUsers, pendingUsers, onboardedUsers, problemCredentials } = await getDashboardData();
 
   return (
     <div className="space-y-6">
