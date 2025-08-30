@@ -8,49 +8,50 @@ import type { User, UserRole } from "@/lib/types";
 const useMockAuth = () => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [allUsers, setAllUsers] = useState<User[]>([]);
   const router = useRouter();
 
-  // Fetch all users once to simulate auth checking
-  const [allUsers, setAllUsers] = useState<User[]>([]);
-
   const fetchUsers = useCallback(async () => {
-    // In a real app, you'd have an API endpoint for this.
-    const res = await fetch('/api/users?all=true');
-    const data = await res.json();
-    setAllUsers(data.users);
-    return data.users;
+    try {
+      const res = await fetch('/api/users?all=true');
+      if (!res.ok) {
+        throw new Error('Failed to fetch users');
+      }
+      const data = await res.json();
+      setAllUsers(data.users || []);
+      return data.users || [];
+    } catch (error) {
+      console.error("Failed to fetch users:", error);
+      setAllUsers([]); // Ensure allUsers is an empty array on error
+      return [];
+    }
   }, []);
 
   useEffect(() => {
-    fetchUsers();
-  }, [fetchUsers]);
-
-
-  useEffect(() => {
-    if (allUsers.length === 0 && loading) {
-       // if we have no users, we're not done loading yet
-       // but if we are not loading, it means there are no users in DB
-       return; 
-    }
-    try {
-      const storedUserId = localStorage.getItem("loggedInUser");
-      if (storedUserId) {
-        const currentUser = allUsers.find((u) => u.id === storedUserId);
-        setUser(currentUser || null);
+    const initializeAuth = async () => {
+      setLoading(true);
+      const users = await fetchUsers();
+      try {
+        const storedUserId = localStorage.getItem("loggedInUser");
+        if (storedUserId) {
+          const currentUser = users.find((u: User) => u.id === storedUserId);
+          setUser(currentUser || null);
+        }
+      } catch (error) {
+        console.error("Could not access localStorage", error);
+        setUser(null);
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      console.error("Could not access localStorage", error);
-    } finally {
-      setLoading(false);
-    }
-  }, [allUsers, loading]);
+    };
+
+    initializeAuth();
+  }, [fetchUsers]);
 
   const login = useCallback(
     async (email: string, password?: string) => {
       let userToLogin = allUsers.find((u) => u.email === email && u.password === password);
 
-      // If user is not found, refresh the list and try again.
-      // This handles the case where a user signs up and immediately tries to log in.
       if (!userToLogin) {
         const freshUsers = await fetchUsers();
         userToLogin = freshUsers.find((u: User) => u.email === email && u.password === password);
@@ -58,7 +59,7 @@ const useMockAuth = () => {
 
       if (userToLogin) {
         try {
-          localStorage.setItem("loggedInUser", userToLogin.id); // Store the unique ID
+          localStorage.setItem("loggedInUser", userToLogin.id);
           setUser(userToLogin);
           if (userToLogin.role === "admin") {
             router.push("/admin/dashboard");
@@ -68,8 +69,11 @@ const useMockAuth = () => {
         } catch (error) {
           console.error("Could not access localStorage", error);
         }
+        return userToLogin;
       }
-      return userToLogin;
+      
+      // Explicitly return null if login fails
+      return null;
     },
     [router, allUsers, fetchUsers]
   );
@@ -97,7 +101,7 @@ const useMockAuth = () => {
       
       const currentUser = allUsers.find((u) => u.id === storedUserId);
       if (!currentUser || (role && currentUser.role !== role)) {
-         logout(); // If user is invalid or role doesn't match, log them out
+         logout();
       }
     },
     [router, loading, allUsers, logout]
