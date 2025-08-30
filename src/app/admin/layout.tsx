@@ -70,7 +70,7 @@ export default function AdminLayout({
                 isActive={pathname.startsWith('/admin/users')}
                 tooltip={{ children: 'Users' }}
               >
-                <Link href="/admin/dashboard"> 
+                <Link href="/admin/dashboard#users"> 
                   <Users />
                   <span>Users</span>
                 </Link>
